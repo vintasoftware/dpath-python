@@ -138,13 +138,14 @@ def set(obj, glob, value, separator='/', afilter=None):
     return changed
 
 
-def get(obj, glob, separator='/'):
+def get(obj, glob, separator='/', default=None):
     '''
     Given an object which contains only one possible match for the given glob,
     return the value for the leaf matching the given glob.
 
     If more than one leaf matches the glob, ValueError is raised. If the glob is
-    not found, KeyError is raised.
+    not found, KeyError is raised when default parameter is None, otherwise default
+    is returned.
     '''
     globlist = __safe_path__(glob, separator)
 
@@ -159,7 +160,9 @@ def get(obj, glob, separator='/'):
     results = dpath.segments.fold(obj, f, [])
 
     if len(results) == 0:
-        raise KeyError(glob)
+        if default is None:
+            raise KeyError(glob)
+        return default
     elif len(results) > 1:
         raise ValueError("dpath.util.get() globs must match only one leaf : %s" % glob)
 
